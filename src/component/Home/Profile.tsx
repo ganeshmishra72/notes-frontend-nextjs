@@ -53,13 +53,16 @@ const stats = [
 
 const Profile = () => {
    const token: any = Authstore(sta => sta.refreshToken)
-  const {data} =useQuery({
+  const { data, error, isError, isLoading } =useQuery({
     queryFn:getProfile,
     queryKey:["profile"],
-    enabled:!!token
+    enabled:!!token,
+     staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: 1,
   })
 
-  console.log(data);
+   
   
   
   return (
@@ -80,33 +83,41 @@ const Profile = () => {
 
             <div className="flex items-center gap-6 flex-col lg:flex-row">
 
-              <div className="w-28 h-28 rounded-full bg-white flex items-center justify-center shadow-xl">
-                <User size={55} className="text-blue-600" />
-              </div>
+              <div className="w-28 h-28 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-xl">
+  {data?.image ? (
+    <img
+      src={data.image}
+      alt={data.name}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <User size={55} className="text-blue-600" />
+  )}
+</div>
 
               <div>
 
                 <h1 className="text-4xl font-bold">
-                  Ganesh Mishra
+                  {data?.name}
                 </h1>
 
                 <p className="mt-2 text-blue-100">
                   Computer Engineering Student
                 </p>
-
+                  
                 <div className="flex flex-wrap gap-3 mt-5">
 
                   <span className="bg-white/20 px-4 py-2 rounded-full text-sm">
-                    SPPU
-                  </span>
+  {data?.role}
+</span>
 
-                  <span className="bg-white/20 px-4 py-2 rounded-full text-sm">
-                    Semester 6
-                  </span>
+<span className="bg-white/20 px-4 py-2 rounded-full text-sm">
+  {data?.provider}
+</span>
 
-                  <span className="bg-white/20 px-4 py-2 rounded-full text-sm">
-                    Active Learner
-                  </span>
+<span className="bg-white/20 px-4 py-2 rounded-full text-sm">
+  {data?.enabled ? "Active Account" : "Disabled"}
+</span>
 
                 </div>
 
@@ -168,30 +179,40 @@ const Profile = () => {
 
             <div className="grid md:grid-cols-2 gap-6">
 
-              <InfoCard icon={<User />} label="Full Name" value="Ganesh Mishra" />
+              <InfoCard icon={<User />} label="Full Name" value={data?.name} />
 
-              <InfoCard icon={<Mail />} label="Email" value="ganesh@gmail.com" />
-
-              <InfoCard icon={<Phone />} label="Phone" value="+91 9876543210" />
-
-              <InfoCard
-                icon={<Building2 />}
-                label="University"
-                value="Savitribai Phule Pune University"
-              />
-
-              <InfoCard
-                icon={<GraduationCap />}
-                label="Branch"
-                value="Computer Engineering"
-              />
-
-              <InfoCard
-                icon={<Calendar />}
-                label="Semester"
-                value="Semester 6"
-              />
-
+              <InfoCard icon={<Mail />} label="Email" value={data?.email} />
+<InfoCard
+  icon={<User />}
+  label="Role"
+  value={data?.role}
+/>
+<InfoCard
+  icon={<BookOpen />}
+  label="Login Provider"
+  value={data?.provider}
+/>
+              <InfoCard icon={<Phone />} label="Phone" value={data?.phone || "Not Added"} />
+<InfoCard
+  icon={<FileText />}
+  label="Bio"
+  value={data?.bio || "No bio added yet."}
+/>
+<InfoCard
+  icon={<Settings />}
+  label="Account Status"
+  value={data?.enabled ? "Active" : "Disabled"}
+/>
+<InfoCard
+  icon={<Calendar />}
+  label="Last Login"
+  value={new Date(data?.lastLogin).toLocaleString()}
+/>
+<InfoCard
+  icon={<Calendar />}
+  label="Joined On"
+  value={new Date(data?.createdAt).toLocaleDateString()}
+/>
             </div>
 
           </div>
