@@ -147,7 +147,7 @@ export default function Footer() {
                   <Mail className="text-blue-600 mt-1" size={18} />
 
                   <span className="text-slate-600">
-                    support@noteshub.com
+                    raghvendra0550@gmail.com
                   </span>
 
                 </div>
@@ -157,7 +157,7 @@ export default function Footer() {
                   <Phone className="text-blue-600 mt-1" size={18} />
 
                   <span className="text-slate-600">
-                    +91 98765 43210
+                    +91 86003 27769
                   </span>
 
                 </div>
