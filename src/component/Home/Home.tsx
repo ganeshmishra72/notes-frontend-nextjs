@@ -273,7 +273,7 @@ const FeatureCard = ({ icon, title, desc }: FeatureProps) => {
         {icon}
       </div>
 
-      <h3 className="text-2xl font-bold mt-6">
+      <h3 className="text-2xl font-bold mt-6 text-gray-700">
         {title}
       </h3>
 

@@ -15,6 +15,9 @@ import { FaHome } from "react-icons/fa";
 import { Award, Bookmark, BookOpen, Calendar, Camera, Download, FileText, LogOut, Mail, Moon, Pencil, Phone, Save, Settings, Shield, Sun, Trash2, Upload, User, X } from "lucide-react";
 import Layout from "./Layout";
 import { FcSettings } from "react-icons/fc";
+import { useLogout } from "@/hooks/Authhooks";
+import {  useRouter } from "next/navigation";
+import { refresh } from "next/cache";
 
 const stats = [
   {
@@ -76,10 +79,12 @@ const Profile = () => {
   const { mutate: updateProfile } = updateuserData();
   const { mutate: deleteUser } = delteUserData();
   const { mutate } = uploadImage()
+  const {mutate:logoutSession}=useLogout()
   const token: any = Authstore(sta => sta.refreshToken)
+  const router=useRouter()
 
   const formik = useFormik({
-    initialValues: { image: null, id: "", name: "", email: "", bio: "", phone: "", createAt: "", updateAt: "", role: "", provider: "", lastlogin: "", emailverfied: null },
+    initialValues: { image: null, id: "", name: "", email: "", bio: "", phone: "", createdAt: null, updatedAt: null, role: "", provider: "", lastlogin: "" },
     validationSchema: ProfileSchema,
     onSubmit: () => {
       handelUpdate();
@@ -126,14 +131,14 @@ const Profile = () => {
       email: data.email,
       phone: data.phone,
       role: data.role,
-      createAt: data.createAt,
-      updateAt: data.updateAt,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
       image: data.image,
       provider: data.provider,
       lastlogin: data.lastLogin,
       bio: data.bio,
-      emailverified: data.emailverified,
-      enable: data.enable
+      emailVerified: data.emailVerified,
+      enabled: data.enabled
     })
   })
 
@@ -144,12 +149,11 @@ const Profile = () => {
       name: data?.name || " ",
       phone: data?.phone || "",
       role: data?.role || "",
-      createAt: data?.createAt || "",
-      updateAt: data?.updateAt || "",
+      createdAt: data?.createdAt || "",
+      updatedAt: data?.updatedAt || "",
       email: data?.email || "",
       provider: data?.provider || "",
       lastlogin: data?.lastlogin || "",
-      emailverfied: data?.emailverified || false,
       bio: data?.bio || ""
 
     })
@@ -161,7 +165,7 @@ const Profile = () => {
 
 
   const handelDelete = () => {
-    deleteUser(data?.id, {
+    deleteUser(data?.email, {
       onSuccess: () => {
         toast.success("Deleted Successfully")
         queryClinet.removeQueries({ queryKey: ["profile"] })
@@ -190,14 +194,21 @@ const Profile = () => {
     updateProfile({ email: data.email, data: payload },
       {
         onSuccess: () => {
-          toast.success("Update SuccessFully ")
+           
           queryClinet.setQueryData(["profile"], (old: any) => ({ ...old, ...payload }))
+          setOpenEdit(false)
         },
         onError: () => { toast.error("Updaet Failed") }
       }
     )
   }
 
+   const handelLogout=()=>{
+     logoutSession(undefined)
+     setOpenSettings(false)
+     router.refresh()
+     router.push("/")
+  }
 
   if (isLoading) return <div className='flex items-center justify-center w-4xl'> WAIT</div>
   //  if (isLoading) return <div className='flex items-center justify-center w-4xl'> <Spinner /></div>
@@ -211,8 +222,10 @@ const Profile = () => {
     );
   }
 
+  console.log(data);
+  
   return (
-    <div className="min-h-screen bg-slate-50  pt-16 pb-20">
+    <div className="min-h-screen bg-slate-50  md:pt-16 pb-20 pt-8">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Profile Header */}
@@ -271,7 +284,11 @@ const Profile = () => {
                   </span>
 
                   <span className="bg-white/20 px-4 py-2 rounded-full text-sm">
-                    {data?.enable ? "Active Account" : "Disabled"}
+                    {data?.enabled ? "Active Account" : "Disabled"}
+                  </span>
+
+                  <span className="bg-white/20 px-4 py-2 rounded-full text-sm">
+                    {data?.emailVerified ? "Email Verified" : "Email Not Verified"}
                   </span>
 
                 </div>
@@ -289,9 +306,9 @@ const Profile = () => {
           <Dialog
             open={openEdit}
             onClose={() => setOpenEdit(false)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 md:p-0 "
           >
-            <DialogPanel className="bg-white rounded-3xl w-full max-w-lg p-8">
+            <DialogPanel className="bg-white rounded-3xl w-full max-w-lg p-8 ">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-700">Edit Profile</h2>
 
@@ -431,7 +448,7 @@ const Profile = () => {
               <InfoCard
                 icon={<Settings />}
                 label="Account Status"
-                value={data?.enable ? "Active" : "Disabled"}
+                value={data?.enabled ? "Active" : "Disabled"}
               />
               <InfoCard
                 icon={<Calendar />}
@@ -441,7 +458,7 @@ const Profile = () => {
               <InfoCard
                 icon={<Calendar />}
                 label="Joined On"
-                value={new Date(data?.createAt).toLocaleDateString()}
+                value={new Date(data?.createdAt).toLocaleDateString()}
               />
             </div>
 
@@ -480,7 +497,7 @@ const Profile = () => {
 
           onClose={() => setOpenSettings(false)}
 
-          className="fixed inset-0 bg-black/40 flex justify-center items-center z-50"
+          className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4 md:p-0"
 
         >
 
@@ -539,13 +556,13 @@ const Profile = () => {
 
               <button
                 className="w-full flex items-center gap-3 p-4 rounded-xl border hover:bg-slate-100 text-gray-700"
-
+                  onClick={()=>handelLogout()}
               >
                 <LogOut />
                 Logout
               </button>
 
-              <button onClick={handelDelete}
+              <button onClick={()=>handelDelete()}
                 className="w-full flex items-center gap-3 p-4 rounded-xl border text-red-600 hover:bg-red-50"
 
               >

@@ -27,7 +27,7 @@ const navLinks = [
   },
   {
     name: "Universities",
-    href: "/universities",
+    href: "/university",
   },
   {
     name: "Boards",

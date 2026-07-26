@@ -15,10 +15,11 @@ import { FcGoogle } from "react-icons/fc";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/Authhooks";
+ 
 
 const Login = () => {
   const router=useRouter();
-   const { mutate,isPending,isError}= useLogin();
+   const { mutate,isPending,isError,error}= useLogin();
   const [showPassword, setShowPassword] = useState(false);
     
   const formik=useFormik({
@@ -44,6 +45,12 @@ const Login = () => {
       })
     }
   })
+
+  const apiError=error as any
+ const emailNotVerified =
+  
+  apiError?.response?.data?.error ===
+    "Email is Not Verified Please Verify Your Email";
 
 
   return (
@@ -118,6 +125,10 @@ const Login = () => {
 
           <button
             className="mt-8 w-full border text-black border-slate-300 rounded-xl h-12 flex items-center justify-center gap-3 hover:bg-slate-50 transition font-medium   "
+             onClick={() => {
+    window.location.href =
+      "http://localhost:8082/oauth2/authorization/google";
+  }}
           >
              <FcGoogle className="text-2xl" />
 
@@ -216,7 +227,7 @@ const Login = () => {
 
           {/* LOGIN */}
                 {
-                  isError ?
+                  emailNotVerified ?
                   <div>
                      <p className="text-center mt-8 text-slate-600">
 
