@@ -13,6 +13,9 @@ import {
   BookOpen,
 } from "lucide-react";
 import Layout from "../Home/Layout";
+import { useQuery } from "@tanstack/react-query";
+import { getUniversities } from "@/service/UniversityService";
+import Authstore from "@/store/AuthStore";
 
 interface University {
   id: string;
@@ -65,13 +68,24 @@ const universities: University[] = [
 
 const University = () => {
   const [search, setSearch] = useState("");
-
+  const token=Authstore(s=>s.accessToken)
   const filtered = universities.filter((u) =>
     u.universityName.toLowerCase().includes(search.toLowerCase())
   );
 
+  const {data} =useQuery({
+      queryKey:['university'],
+      queryFn:getUniversities,
+      retry:1,
+      enabled:!!token,
+      
+  })
+console.log(data);
+
   return (
+    
     <Layout>
+       
       <div className="bg-slate-50 min-h-screen pt-32 pb-20">
 
         <div className="max-w-7xl mx-auto px-6">
