@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
  
 import {
   Search,
@@ -33,54 +33,27 @@ interface University {
   establisYear: string;
 }
 
-const universities: University[] = [
-  {
-    id: "1",
-    universityName: "Savitribai Phule Pune University",
-    universityCOde: "SPPU001",
-    shortName: "SPPU",
-    state: "Maharashtra",
-    city: "Pune",
-    pincode: "411007",
-    type: "Government",
-    website: "https://unipune.ac.in",
-    email: "info@unipune.ac.in",
-    phoneNumber: "+91 9876543210",
-    logoUrl: "https://placehold.co/120x120",
-    establisYear: "1949",
-  },
-  {
-    id: "2",
-    universityName: "Mumbai University",
-    universityCOde: "MU001",
-    shortName: "MU",
-    state: "Maharashtra",
-    city: "Mumbai",
-    pincode: "400032",
-    type: "Government",
-    website: "https://mu.ac.in",
-    email: "info@mu.ac.in",
-    phoneNumber: "+91 9876543211",
-    logoUrl: "https://placehold.co/120x120",
-    establisYear: "1857",
-  },
-];
+
 
 const University = () => {
   const [search, setSearch] = useState("");
   const token=Authstore(s=>s.accessToken)
-  const filtered = universities.filter((u) =>
-    u.universityName.toLowerCase().includes(search.toLowerCase())
-  );
+  const { data = [] } = useQuery({
+  queryKey: ["university"],
+  queryFn: getUniversities,
+  enabled: !!token,
+  retry: 1,
+  staleTime: 1000 * 60 * 5,
+  refetchOnWindowFocus: false,
+});
 
-  const {data} =useQuery({
-      queryKey:['university'],
-      queryFn:getUniversities,
-      retry:1,
-      enabled:!!token,
-      
-  })
-console.log(data);
+const filtered = data.filter((u: University) =>
+  u.universityName.toLowerCase().includes(search.toLowerCase()) ||
+  u.shortName.toLowerCase().includes(search.toLowerCase()) ||
+  u.city.toLowerCase().includes(search.toLowerCase()) ||
+  u.state.toLowerCase().includes(search.toLowerCase())
+);
+ 
 
   return (
     
@@ -189,7 +162,7 @@ console.log(data);
 
           <div className="grid lg:grid-cols-2 gap-8">
 
-            {filtered.map((u) => (
+            {filtered.map((u:any) => (
 
               <div
                 key={u.id}

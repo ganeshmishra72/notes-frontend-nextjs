@@ -18,6 +18,7 @@ import { FcSettings } from "react-icons/fc";
 import { useLogout } from "@/hooks/Authhooks";
 import {  useRouter } from "next/navigation";
 import { refresh } from "next/cache";
+import { FadeLoader } from "react-spinners";
 
 const stats = [
   {
@@ -210,8 +211,10 @@ const Profile = () => {
      router.push("/")
   }
 
-  if (isLoading) return <div className='flex items-center justify-center w-4xl'> WAIT</div>
-  //  if (isLoading) return <div className='flex items-center justify-center w-4xl'> <Spinner /></div>
+  // if (isLoading) return <div className='flex items-center justify-center w-4xl'> WAIT</div>
+   if (isLoading) return <div className='flex items-center justify-center w-4xl'> 
+   <FadeLoader/>
+   </div>
   if (isError) {
     return (
       <Layout>
