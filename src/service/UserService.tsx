@@ -25,3 +25,21 @@ export const deleteProfile=async(email:string)=>{
   const response=await apiclient.put(`/users/delete/${email}`)
     return  response.data  
 }
+
+// admin
+export const getAllUsers=async()=>{
+   const response=await apiclient.get("/users")
+   return response.data
+}
+
+
+
+export const updateStatus=async(email:string,enable:boolean)=>{
+  
+   const response=await apiclient.patch(`/users/status/${email}`,enable,{
+      headers:{
+         "Content-Type":"application/json"
+      }
+   })
+   return response.data
+}

@@ -21,6 +21,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import useSidebarStore from "@/store/AdminSlideBarStore";
+import Authstore from "@/store/AuthStore";
+import { useLogout } from "@/hooks/Authhooks";
 
 const menus = [
   {
@@ -29,7 +31,7 @@ const menus = [
       {
         icon: LayoutDashboard,
         name: "Dashboard",
-        href: "/admin/dashboard",
+        href: "/admin",
       },
     ],
   },
@@ -40,12 +42,12 @@ const menus = [
       {
         icon: Building2,
         name: "Universities",
-        href: "/admin/universities",
+        href: "/admin/university",
       },
       {
         icon: GraduationCap,
         name: "Boards",
-        href: "/admin/boards",
+        href: "/admin/board",
       },
       {
         icon: FolderTree,
@@ -55,12 +57,12 @@ const menus = [
       {
         icon: Layers3,
         name: "Branches",
-        href: "/admin/branches",
+        href: "/admin/branche",
       },
       {
         icon: LibraryBig,
         name: "Subjects",
-        href: "/admin/subjects",
+        href: "/admin/subject",
       },
     ],
   },
@@ -87,7 +89,7 @@ const menus = [
       {
         icon: Users,
         name: "Users",
-        href: "/admin/users",
+        href: "/admin/user",
       },
       {
         icon: BarChart3,
@@ -97,12 +99,12 @@ const menus = [
       {
         icon: Shield,
         name: "Roles",
-        href: "/admin/roles",
+        href: "/admin/role",
       },
       {
         icon: Settings,
         name: "Settings",
-        href: "/admin/settings",
+        href: "/admin/setting",
       },
     ],
   },
@@ -116,8 +118,12 @@ export default function Sidebar() {
     closeMobile,
   } = useSidebarStore();
 
+  const {mutate}=useLogout()
   const pathname = usePathname();
 
+  const handelLogout=()=>{
+     mutate(undefined)
+  }
   return (
     <aside
       className={`
@@ -235,7 +241,7 @@ ${mobileOpen
 
       <div className="absolute bottom-0 w-full border-t border-slate-800 p-4">
 
-        <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500/10 py-3 text-red-400 transition hover:bg-red-500 hover:text-white">
+        <button onClick={()=>handelLogout()} className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500/10 py-3 text-red-400 transition hover:bg-red-500 hover:text-white">
 
           {
             collapsed ?

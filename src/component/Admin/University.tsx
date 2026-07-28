@@ -289,14 +289,6 @@ const formik=useFormik({
           <TableCell>
 
             <div className="flex justify-center gap-2">
-
-              <Button
-                size="icon"
-                variant="outline"
-              >
-                <Eye size={16} />
-              </Button>
-
               <Button  
                 onClick={()=>{handleEdit(item),setOpen(true)}}
                 size="icon"
@@ -399,7 +391,7 @@ const formik=useFormik({
       </div>
 
       <div className="space-y-4">
-        <Label  >Logo URL</Label>
+        <Label  >Image</Label>
       <Input
     type="file"
     onChange={(e) => {

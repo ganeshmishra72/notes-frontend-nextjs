@@ -1,5 +1,5 @@
-import { deleteProfile, updateProfile, updateProfileImage } from "@/service/UserService";
-import { useMutation } from "@tanstack/react-query";
+import { deleteProfile, updateProfile, updateProfileImage, updateStatus } from "@/service/UserService";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -47,8 +47,15 @@ export function updateuserData() {
 }
 
 export function delteUserData() {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: deleteProfile,
+        onSuccess: () => {
+            toast.success("User Deleted Successfully")
+            queryClient.invalidateQueries({
+                queryKey: ["users"],
+            });
+        },
         onError: (error) => {
             if (axios.isAxiosError(error)) {
                 const message = error.response?.data?.message ||
@@ -59,3 +66,25 @@ export function delteUserData() {
         }
     })
 }
+export function useUpdateUserStatus() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ email, enable }: { email: string, enable: boolean }) => updateStatus(email, enable),
+        onSuccess: (value) => {
+            console.log(value);
+            toast.success("Update Status")
+            queryClient.invalidateQueries({
+                queryKey: ["users"],
+            });
+        },
+        onError: (error) => {
+            if (axios.isAxiosError(error)) {
+                const message = error.response?.data?.message ||
+                    error.response?.data?.error ||
+                    "Status Chnage  Failed Or Network Down";
+                toast.error(message)
+            }
+        }
+    })
+}
+
