@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Building2, Eye, Trash2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -16,9 +16,30 @@ import Authstore from "@/store/AuthStore";
 import { useQuery } from "@tanstack/react-query";
 import { getUniversities } from "@/service/UniversityService";
 import { useFormik } from "formik";
+import useUniversity from "@/hooks/Universtiyhooks";
  
+ 
+interface University {
+  id: string;
+  universityName: string;
+  universityCOde: string;
+  shortName: string;
+  state: string;
+  city: string;
+  pincode: string;
+  type: string;
+  website: string;
+  email: string;
+  phoneNumber: string;
+  logoUrl: string;
+  establisYear: string;
+}
+
 export default function UniversitiesPage() {
+
   const [open, setOpen] = useState(false);
+  const {mutate,isPending,isSuccess}=useUniversity()
+  const [editUniversity,setEditUniversity]=useState<University | null>(null);
    const token=Authstore(s=>s.accessToken)
   const { data = [] } = useQuery({
   queryKey: ["university"],
@@ -29,14 +50,42 @@ export default function UniversitiesPage() {
   refetchOnWindowFocus: false,
 });
 
+const handleEdit = (university: University) => {
+  setEditUniversity(university);
+
+  formik.setValues({
+    logoUrl: "",
+    universityName: university.universityName,
+    universityCOde: university.universityCOde,
+    shortName: university.shortName,
+    state: university.state,
+    city: university.city,
+    pincode: university.pincode,
+    type: university.type,
+    website: university.website,
+    email: university.email,
+    phoneNumber: university.phoneNumber,
+    establisYear: university.establisYear,
+  });
+};
+
 const formik=useFormik({
     initialValues:{logoUrl: "",universityName:"",universityCOde:"",shortName:"",state:"",city:"",pincode:"",type:"",website:"",email:"",phoneNumber:"",establisYear:""},
     onSubmit:(values)=>{
-           console.log(values);
+          if(editUniversity){
+            console.log("edit");
+             setOpen(false)
+          }
+          else{
+            mutate(values)
+            setOpen(false)
+            formik.resetForm()
+          }
            
     }
 })
 
+  const isRead=(editUniversity?true:false)
   return (
     <div className="space-y-8">
 
@@ -79,6 +128,7 @@ const formik=useFormik({
           <Plus size={20} />
           Add University
         </motion.button>
+       
 
       </div>
 
@@ -139,7 +189,7 @@ const formik=useFormik({
         <TableRow key={item.id}>
           <TableCell>
             <Image
-                src={ item.logoUrl|| "/file.svg"}
+              src={  "/file.svg"}
               alt={item.universityName}
               width={45}
               height={45}
@@ -235,7 +285,8 @@ const formik=useFormik({
                 <Eye size={16} />
               </Button>
 
-              <Button
+              <Button  
+                onClick={()=>{handleEdit(item),setOpen(true)}}
                 size="icon"
                 className="bg-blue-600 hover:bg-blue-700"
               >
@@ -280,17 +331,18 @@ const formik=useFormik({
       </div>
 
       <div className="space-y-4">
-        <Label>Short Name</Label>
-         <Input name="shortName" value={formik.values.shortName} onChange={formik.handleChange} />
+        <Label className={`${editUniversity? "text-gray-400":"text-black"}`}>Short Name</Label>
+         <Input name="shortName" value={formik.values.shortName} onChange={formik.handleChange} readOnly={isRead}/>
       </div>
 
       <div className="space-y-4">
-        <Label>Type</Label>
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>Type</Label>
         <select
           name="type"
           value={formik.values.type}
           onChange={formik.handleChange}
           className="w-full h-10 rounded-md border px-3"
+          disabled={isRead}
         >
           <option value="">Select</option>
           <option value="Government">Government</option>
@@ -299,43 +351,43 @@ const formik=useFormik({
       </div>
 
       <div className="space-y-4">
-        <Label>State</Label>
-        <Input name="state" value={formik.values.state} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>State</Label>
+        <Input name="state" value={formik.values.state} onChange={formik.handleChange} readOnly={isRead} />
       </div>
 
       <div className="space-y-4">
-        <Label>City</Label>
-        <Input name="city" value={formik.values.city} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>City</Label>
+        <Input name="city" value={formik.values.city} onChange={formik.handleChange}  readOnly={isRead}/>
       </div>
 
       <div className="space-y-4">
-        <Label>Pincode</Label>
-         <Input name="pincode" value={formik.values.pincode} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>Pincode</Label>
+         <Input name="pincode" value={formik.values.pincode} onChange={formik.handleChange} readOnly={isRead} />
       </div>
 
       <div className="space-y-4">
-        <Label>Website</Label>
-         <Input name="website" value={formik.values.website} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>Website</Label>
+         <Input name="website" value={formik.values.website} onChange={formik.handleChange} readOnly={isRead} />
       </div>
 
       <div className="space-y-4">
-        <Label>Email</Label>
-        <Input name="email" value={formik.values.email} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>Email</Label>
+        <Input name="email" value={formik.values.email} onChange={formik.handleChange} readOnly={isRead} />
       </div>
 
       <div className="space-y-4">
-        <Label>Phone Number</Label>
-         <Input name="phoneNumber" value={formik.values.phoneNumber} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>Phone Number</Label>
+         <Input name="phoneNumber" value={formik.values.phoneNumber} onChange={formik.handleChange} readOnly={isRead} />
       </div>
 
       <div className="space-y-4">
-        <Label>Established Year</Label>
-         <Input name="establisYear" value={formik.values.establisYear} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>Established Year</Label>
+         <Input name="establisYear" value={formik.values.establisYear} onChange={formik.handleChange} readOnly={isRead} />
       </div>
 
       <div className="space-y-4">
-        <Label>Logo URL</Label>
-         <Input name="logoUrl" value={formik.values.logoUrl} onChange={formik.handleChange} />
+        <Label  className={`${editUniversity? "text-gray-400":"text-black"}`}>Logo URL</Label>
+         <Input name="logoUrl" value={formik.values.logoUrl} onChange={formik.handleChange} readOnly={isRead} />
       </div>
 
 
@@ -349,9 +401,9 @@ const formik=useFormik({
       <Button
        type="submit"
       
-        className="bg-blue-600 hover:bg-blue-700"
+        className={`${isRead?"bg-green-600 hover:bg-green-700":"bg-blue-600 hover:bg-blue-700"}`}
       >
-        Save University
+        {isRead ?"Update University":"Save University"}
       </Button>
     </form>
   </DialogContent>
