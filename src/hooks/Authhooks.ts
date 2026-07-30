@@ -1,4 +1,4 @@
-import { login, logout } from "@/service/AuthService"
+import { forgotPassword, login, logout, resetPassword } from "@/service/AuthService"
 import Authstore from "@/store/AuthStore"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
@@ -72,5 +72,48 @@ const useLogout = () => {
         }
     });
 }
+
+
+export const useForgotPassword = () => {
+    return useMutation({
+        mutationFn: forgotPassword,
+
+        onSuccess: (data) => {
+            toast.success(data);
+        },
+
+        onError: (error: any) => {
+            if (axios.isAxiosError(error)) {
+                const message =
+                    error.response?.data?.message ||
+                    error.response?.data?.error ||
+                    "Forget Password Failed Or Network Down";
+                toast.error(message)
+            }
+        }
+    });
+};
+
+export const useResetPassword = () => {
+    return useMutation({
+        mutationFn: resetPassword,
+
+        onSuccess: (data) => {
+            console.log(data);
+
+            toast.success("Successfully Change Password");
+        },
+
+        onError: (error: any) => {
+            if (axios.isAxiosError(error)) {
+                const message =
+                    error.response?.data?.message ||
+                    error.response?.data?.error ||
+                    "Reset Password Failed Or Network Down";
+                toast.error(message)
+            }
+        }
+    });
+};
 
 export { useLogin, useLogout }

@@ -214,16 +214,16 @@ const Login = () => {
 
           </div>
 
-          <div className="flex justify-end mt-3">
+          <Link className="flex justify-end mt-3 text-blue-600 text-sm hover:underline cursor-pointer"
 
-            <Link
-              href="/forgot-password"
-              className="text-blue-600 text-sm hover:underline"
+             
+              href="/forget-password"
+              
             >
               Forgot Password?
-            </Link>
+           
 
-          </div>
+          </Link>
 
           {/* LOGIN */}
                 {
