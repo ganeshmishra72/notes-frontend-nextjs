@@ -18,6 +18,7 @@ import { getUniversities } from "@/service/UniversityService";
 import { useFormik } from "formik";
 import { useDeleteUniversity, useUniversity, useUpdateUniversity } from "@/hooks/Universtiyhooks";
 import toast from "react-hot-toast";
+import { getAllUniversity } from "@/util/UniversityService";
  
  
  
@@ -44,15 +45,8 @@ export default function UniversitiesPage() {
   const {mutate: updateUniversityDetails}=useUpdateUniversity()
   const {mutate:deleteUniversityData}=useDeleteUniversity()
   const [editUniversity,setEditUniversity]=useState<University | null>(null);
-   const token=Authstore(s=>s.accessToken)
-  const { data = [] } = useQuery({
-  queryKey: ["university"],
-  queryFn: getUniversities,
-  enabled: !!token,
-  retry: 1,
-  staleTime: 1000 * 60 * 5,
-  refetchOnWindowFocus: false,
-});
+   const {data}=getAllUniversity()
+
 
 const handleEdit = (university: University) => {
   setEditUniversity(university);

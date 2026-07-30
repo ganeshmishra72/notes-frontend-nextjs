@@ -1,10 +1,9 @@
- 
-import Subject from '@/component/Admin/Subject'
+import Semester from '@/component/Admin/Semester'
 import React from 'react'
 
 const page = () => {
   return (
-    <Subject/>
+  <Semester/>
   )
 }
 

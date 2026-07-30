@@ -1,43 +1,39 @@
 "use client"
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { GraduationCapIcon, Pencil, Plus, Trash2 } from 'lucide-react'
+import { GraduationCapIcon, Layers3, Pencil, Plus, Trash2 } from 'lucide-react'
 import React, { useState } from 'react'
-import { FaFolderTree } from 'react-icons/fa6'
-import { motion } from "framer-motion";
-import Authstore from '@/store/AuthStore'
+import { motion, number } from "framer-motion";
 import { useFormik } from 'formik'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { useCourse, useDeleteCourse, useUpdateCourse } from '@/hooks/Coursehook'
-import { getAllCourses, getAllUniversity } from '@/util/UniversityService'
+import { useBranch, useDeleteBranch, useUpdateBranch } from '@/hooks/Branchehook'
+import { getAllBranche, getAllCourses, getALLSemester } from '@/util/UniversityService'
+import { useDeleteSemester, useSemester, useUpdateSemester } from '@/hooks/Semesterhook'
 
 
-interface Course {
-    id:string;
-
-     coursedName:string;
-
-     duration:string;
-
-    universityId:string;
+interface Semester {
+        id:string;
+     semesterNumber:number;
+    semesterName:string;
+    branchId:string;
+    academicYear:string;
 }
-const Course = () => {
+const Semester = () => {
   const [open, setOpen] = useState(false);
-   const {mutate }=useCourse()
-  const {mutate: updateCourseDetails}=useUpdateCourse()
-  const {mutate:deleteCourseData}=useDeleteCourse()
-  const [editCourse, setEditCourse] = useState<Course | null>(null);
-  
-  const { data, isError, isLoading } =getAllCourses()
+   const {mutate }=useSemester()
+  const {mutate: updateSemetserDetails}=useUpdateSemester()
+  const {mutate:deleteSemeterData}=useDeleteSemester()
+  const [editSemester, setEditSemester] = useState<Semester | null>(null);
+  const { data, isError, isLoading } =getALLSemester()
 
   const formik = useFormik({
-    initialValues: { id: "", coursedName: "", duration: "", universityId: "" },
+    initialValues: { id: "", semesterNumber:0,semesterName:"", branchId:"",academicYear:""},
     onSubmit: (values) => {
-      if (editCourse) {
+      if (editSemester) {
          
-        updateCourseDetails({courseId:values.id,updateCourseData:values })
+        updateSemetserDetails({semesterId:values.id,updateSemesterData:values })
         setOpen(false)
       }
       else {
@@ -48,47 +44,50 @@ const Course = () => {
 
     }
   })
-  const handleEdit = (course: Course) => {
-    setEditCourse(course);
+  const handleEdit = (semester: Semester) => {
+    setEditSemester(semester);
 
     formik.setValues({
 
-      id: course.id,
-      coursedName:course.coursedName,
-      duration:course.duration,
-      universityId:course.universityId
+      id:semester.id,
+      semesterName:semester.semesterName,
+      branchId:semester.branchId,
+      academicYear:semester.academicYear,
+      semesterNumber:semester.semesterNumber
+      
 
     });
   };
 
-  const handelDelete = (courseId: string) => {
-     deleteCourseData(courseId)
+  const handelDelete = (semesterId: string) => {
+     deleteSemeterData(semesterId)
   }
 
-  const {data:university}=getAllUniversity()
-   const universityMap = React.useMemo(() => {
-  return (
-    university?.reduce((acc: any, university: any) => {
-      acc[university.id] = university.universityName;
-      return acc;
-    }, {}) || {}
-  );
-}, [university]);
-  const isEditMode = editCourse !== null;
+    const {data:branch}=getAllBranche()
+   const branchMap = React.useMemo(() => {
+    return (
+      branch?.reduce((acc: any, branch: any) => {
+        acc[branch.id] = branch.branchName;
+        return acc;
+      }, {}) || {}
+    );
+  }, [branch]);
+  
+  const isEditMode = editSemester !== null;
   return (
     <div className="space-y-8">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div>
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-2xl bg-blue-100 flex items-center justify-center">
-              <FaFolderTree className="text-blue-600" />
+              <Layers3 className="text-blue-600" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-slate-900">
-                Courses
+                Semesters
               </h1>
               <p className="text-slate-500 mt-1">
-                Manage all Course available in the platform.
+                Manage all Semester available in the platform.
               </p>
             </div>
           </div>
@@ -97,11 +96,11 @@ const Course = () => {
         <motion.button
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
-          onClick={() => { setOpen(true), setEditCourse(null), formik.resetForm() }}
+          onClick={() => { setOpen(true), setEditSemester(null), formik.resetForm() }}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 px-6 py-3 font-semibold text-white shadow-lg"
         >
           <Plus size={20} />
-          Add Courses
+          Add Semester
         </motion.button>
       </div>
 
@@ -109,10 +108,10 @@ const Course = () => {
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-900 hover:bg-slate-900">
-              <TableHead className="text-white">Course Name</TableHead>
-              <TableHead className="text-white">Duration Name</TableHead>
-              <TableHead className="text-white">Universtiy Name</TableHead>
-              <TableHead className="text-white text-center">Actions</TableHead>
+              <TableHead className="text-white">Semester </TableHead>
+              <TableHead className="text-white">Semester Name</TableHead>
+              <TableHead className="text-white text-center">Branch</TableHead>
+              <TableHead className="text-white text-center">Academic Year</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -128,7 +127,7 @@ const Course = () => {
             {isError && (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-6 text-red-500">
-                  Failed to load course
+                  Failed to load semesters
                 </TableCell>
               </TableRow>
             )}
@@ -136,29 +135,30 @@ const Course = () => {
             {!isLoading && !isError && data?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-6">
-                  No course found
+                  No semesters found
                 </TableCell>
               </TableRow>
             )}
 
-            {data?.map((course: any) => (
-              <TableRow key={course.id}>
-                <TableCell>{course.coursedName}</TableCell>
-                <TableCell>{course.duration}</TableCell>
-                 <TableCell>
-                                  {universityMap[course.universityId || "-"]}
-                                </TableCell>
+            {data?.map((semester: any) => (
+              <TableRow key={semester.id}>
+                <TableCell>{semester.semesterNumber}</TableCell>
+                <TableCell>{semester.semesterName}</TableCell>
+                
+                <TableCell>{branchMap[semester.branchId || "-"]}</TableCell>
+                 <TableCell>{semester.academicYear}</TableCell>
+                
                 <TableCell>
                   <div className="flex items-center justify-center gap-3">
                     <button
-                      onClick={()=>{handleEdit(course),setOpen(true)}}
+                      onClick={()=>{handleEdit(semester),setOpen(true)}}
                       className="text-slate-600 hover:text-blue-600"
                       title="Edit"
                     >
                       <Pencil size={16} />
                     </button>
                     <button
-                      onClick={() => handelDelete(course.id)}
+                      onClick={() => handelDelete(semester.id)}
                       className="text-slate-600 hover:text-red-600"
                       title="Delete"
                     >
@@ -177,35 +177,34 @@ const Course = () => {
         <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl p-6">
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
-              <GraduationCapIcon /> Add Course
+              <GraduationCapIcon /> Add Semester
             </DialogTitle>
           </DialogHeader>
 
           <form className="flex flex-col   gap-5 py-4" onSubmit={formik.handleSubmit}>
 
             <div className="space-y-4  w-full">
-              <Label>Course Name</Label>
-              <Input name="coursedName" value={formik.values.coursedName} onChange={formik.handleChange} />
+              <Label>Semester </Label>
+              <Input name="semesterNumber" value={formik.values.semesterNumber} onChange={formik.handleChange} />
             </div>
-
-
-            
-              <div className="space-y-4 w-full">
-                <Label >Duration</Label>
-                <Input name="duration" value={formik.values.duration} onChange={formik.handleChange} />
-              </div>
-
-               <div className="space-y-4 w-full">
-                            <Label>University</Label>
-                             <select name="universityId" className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700 w-full" value={formik.values.universityId} onChange={formik.handleChange}>
-                               <option >Select University</option>
-                              {university?.map((item:any)=>(
-                                <option key={item.id} value={item.id}>{item.universityName}</option>
-                              ))}
-                            </select>
-                          </div>
+            <div className="space-y-4  w-full">
+              <Label>Semester Name </Label>
+              <Input name="semesterName" value={formik.values.semesterName} onChange={formik.handleChange} />
+            </div>
+            <div className="space-y-4 w-full">
+              <Label>Branch</Label>
+               <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700 w-full"  name="branchId" value={formik.values.branchId} onChange={formik.handleChange}>
+                 <option >Select Branch</option>
+                {branch?.map((item:any)=>(
+                  <option key={item.id} value={item.id}>{item.branchName}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-4  w-full">
+              <Label>Academic Year </Label>
+              <Input name="academicYear" value={formik.values.academicYear} onChange={formik.handleChange} />
+            </div>
  
-
            <div className='flex  gap-2'>
             <Button
               variant="outline"
@@ -220,7 +219,7 @@ const Course = () => {
 
               className={`${isEditMode ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"} flex-1`}
             >
-              {isEditMode ? "Update Course" : "Save Course"}
+              {isEditMode ? "Update Semester" : "Save Semester"}
             </Button>
             </div>
           </form>
@@ -230,4 +229,4 @@ const Course = () => {
   )
 }
 
-export default Course
+export default Semester

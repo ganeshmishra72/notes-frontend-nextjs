@@ -14,9 +14,41 @@ import Layout from "../Home/Layout";
 import NoteCard from "./NoteCard";
 import CategoryTabs from "./Category";
 import Pagination from "./Pagination";
+import { getAllBranche, getALLSemester, getAllSubject, getAllUniversity } from "@/util/UniversityService";
+import { useNotesFilter } from "@/hooks/Noteshooks";
 
 const Notes = () => {
-  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState({
+    universityId: "",
+    semesterId: "",
+    subjectId: "",
+    courseId: "",
+    branchId: "",
+    keyWord: "",
+});
+
+const handelReset=()=>{
+  setFilter({
+     universityId: "",
+    semesterId: "",
+    subjectId: "",
+    courseId: "",
+    branchId: "",
+    keyWord: "",
+  })
+}
+
+
+const {data}=getAllUniversity()
+const {data:semester}=getALLSemester()
+const {data:subject}=getAllSubject()
+const {data:bracnh}=getAllBranche()
+const {mutate}=useNotesFilter()
+
+const handelSearch=()=>{
+ mutate(filter)
+  
+}
 
   return (
     <Layout>
@@ -64,9 +96,9 @@ const Notes = () => {
                 />
 
                 <input
-                  value={search}
+                  value={filter.keyWord}
                   onChange={(e) =>
-                    setSearch(e.target.value)
+                    setFilter({...filter,keyWord:e.target.value})
                   }
                   placeholder="Search Notes..."
                   className="w-full h-12 border rounded-xl pl-12 outline-none focus:ring-2 focus:ring-blue-500 border-slate-300 text-gray-700"
@@ -74,27 +106,39 @@ const Notes = () => {
 
               </div>
 
-              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700" >
-                <option>University</option>
+              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700" value={filter.universityId} onChange={(e)=>setFilter({...filter,universityId:e.target.value})}>
+                 <option >Select University</option>
+                {data?.map((item:any)=>(
+                  <option key={item.id} value={item.id}>{item.universityName}</option>
+                ))}
               </select>
 
-              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700">
-                <option>Semester</option>
+              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700" value={filter.semesterId} onChange={(e)=>setFilter({...filter,semesterId:e.target.value})}>
+                <option >Select Semester</option>
+                {semester?.map((item:any)=>(
+                  <option key={item.id} value={item.id}>{item.semesterName}</option>
+                ))}
               </select>
 
-              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700">
-                <option>Subject</option>
+              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700" value={filter.subjectId} onChange={(e)=>setFilter({...filter,subjectId:e.target.value})}>
+                <option >Select Subject</option>
+                {subject?.map((item:any)=>(
+                  <option key={item.id} value={item.id}>{item.name}</option>
+                ))}
               </select>
 
             </div>
 
             <div className="grid lg:grid-cols-6 gap-5 mt-5">
 
-              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700">
-                <option>Branch</option>
+              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700" value={filter.branchId} onChange={(e)=>setFilter({...filter,branchId:e.target.value})}>
+                <option >Select Branch</option>
+                {bracnh?.map((item:any)=>(
+                  <option key={item.id} value={item.id}>{item.branchName}</option>
+                ))}
               </select>
 
-              <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700">
+              {/* <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700">
                 <option>Unit</option>
               </select>
 
@@ -104,13 +148,13 @@ const Notes = () => {
 
               <select className="border rounded-xl h-12 px-4 border-slate-300 text-gray-700">
                 <option>File Type</option>
-              </select>
+              </select> */}
 
-              <button className="h-12 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold hover:opacity-90 transition">
+              <button onClick={()=>handelSearch()} className="h-12 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold hover:opacity-90 transition">
                 Search
               </button>
 
-              <button className="h-12 rounded-xl border flex justify-center items-center gap-2 hover:bg-slate-100 text-red-600">
+              <button onClick={()=>handelReset()} className="h-12 rounded-xl border flex justify-center items-center gap-2 hover:bg-slate-100 text-red-600">
 
                 <RotateCcw size={18} />
 

@@ -19,6 +19,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  School2Icon,
 } from "lucide-react";
 import useSidebarStore from "@/store/AdminSlideBarStore";
 import Authstore from "@/store/AuthStore";
@@ -58,6 +59,11 @@ const menus = [
         icon: Layers3,
         name: "Branches",
         href: "/admin/branche",
+      },
+      {
+        icon: School2Icon,
+        name: "Semester",
+        href: "/admin/semester",
       },
       {
         icon: LibraryBig,

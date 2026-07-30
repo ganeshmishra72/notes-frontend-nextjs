@@ -1,10 +1,15 @@
 import apiclient from "@/config/ApiCall"
-import UpdateUniversity from "@/model/UniversityData"
+
 
 export const getUniversities=async()=>{
  
     const response=await apiclient.get("/university")
     return response.data
+}
+
+export const getUniversityById=async(universityId:any)=>{
+ const response=await apiclient.get(`/university/${universityId}`)
+ return response.data
 }
 
 export const createUniversities=async(registerData:any)=>{
