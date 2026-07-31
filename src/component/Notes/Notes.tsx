@@ -8,15 +8,17 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
  
-// import CategoryTabs from "@/components/notes/CategoryTabs";
-// import Pagination from "@/components/notes/Pagination";
+
 import Layout from "../Home/Layout";
 import NoteCard from "./NoteCard";
 import CategoryTabs from "./Category";
 import Pagination from "./Pagination";
 import { getAllBranche, getALLSemester, getAllSubject, getAllUniversity } from "@/util/UniversityService";
 import { useNotesFilter } from "@/hooks/Noteshooks";
+import { useAiChat } from "../AI-chat/AiChatContext";
 
+
+ 
 const Notes = () => {
   const [filter, setFilter] = useState({
     universityId: "",
@@ -49,6 +51,9 @@ const handelSearch=()=>{
  mutate(filter)
   
 }
+ 
+
+const { openChat } = useAiChat();
 
   return (
     <Layout>
@@ -176,6 +181,24 @@ const handelSearch=()=>{
 
         </section>
 
+        {/* AI SERVICE */}
+                  <div className="fixed bottom-8 right-8 z-50">
+  <button
+    onClick={() => openChat()}
+    className="group flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-600 to-sky-500 px-6 py-4 text-white shadow-2xl transition hover:scale-105"
+  >
+    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-2xl">
+      🤖
+    </div>
+    <div className="hidden md:block text-left">
+      <p className="text-sm opacity-90">AI Assistant</p>
+      <h4 className="font-semibold">Ask Anything</h4>
+    </div>
+  </button>
+</div>
+        {/* AI Assistant */}
+
+ 
         {/* Results */}
 
         <section className="max-w-7xl mx-auto px-6 mt-12">

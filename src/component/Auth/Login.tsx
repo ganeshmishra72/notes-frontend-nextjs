@@ -57,9 +57,8 @@ const Login = () => {
     <div className="min-h-screen bg-linear-to-br from-sky-50 via-blue-100 to-slate-100 flex items-center justify-center px-6 py-10 overflow-hidden relative">
 
       {/* Background Blur */}
-      <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-sky-300/30 blur-3xl animate-pulse"></div>
-
-      <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-blue-400/20 blur-3xl animate-pulse"></div>
+      <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-sky-300/30 blur-3xl animate-pulse pointer-events-none"></div>
+<div className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-blue-400/20 blur-3xl animate-pulse pointer-events-none"></div>
 
       <div className="max-w-6xl w-full grid lg:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden">
 

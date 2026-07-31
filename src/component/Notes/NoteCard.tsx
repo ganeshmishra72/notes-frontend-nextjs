@@ -16,6 +16,7 @@ import {
   Bookmark,
   Heart,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 
 const NoteCard = () => {
@@ -26,6 +27,8 @@ const NoteCard = () => {
       className="group rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-xl overflow-hidden"
     >
       {/* Header */}
+
+ 
 
       <div className="relative bg-gradient-to-r from-blue-600 to-sky-500 p-6">
 
@@ -232,6 +235,13 @@ const NoteCard = () => {
         </Link>
 
       </div>
+      <button
+  // onClick={() => openChat({ noteId: note.id, noteTitle: note.title })}
+  className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 transition"
+>
+  <Sparkles size={14} />
+  Ask AI
+</button>
     </motion.div>
   );
 };
