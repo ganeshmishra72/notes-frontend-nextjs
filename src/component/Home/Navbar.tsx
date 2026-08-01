@@ -348,7 +348,7 @@ transition-all
                 <hr />
 
 {
-    !token &&
+    token ?
 
                 <div className="w-full flex flex-col gap-3">
                 <Link
@@ -367,7 +367,58 @@ text-blue-600"
                 >
                   Sign Up
                 </Link>
-                </div>
+                </div> 
+:   <div className="flex flex-col gap-3">
+
+   <Link  href={"/profile"}
+        onClick={() => setShowMenu((prev) => !prev)}
+        className="
+          w-10
+          h-10
+          rounded-full
+          bg-slate-300
+          hover:bg-blue-400
+          transition
+          flex
+          items-center
+          justify-center
+          text-blue-400
+          font-semibold
+          cursor-pointer
+        "
+      >
+        <span>{"G"}</span>
+      </Link>
+  { !token && (
+  <div
+    className="
+      flex items-center gap-1.5
+      rounded-full
+      bg-blue-50
+      border border-blue-100
+      px-3 py-1.5
+      text-sm font-medium text-blue-700 
+      w-fit
+    "
+    title="Remaining AI credits"
+  >
+    <Coins size={24} className="text-blue-500" />
+    <span>{credits ?? 0}</span>
+  </div>
+)}
+
+ 
+        <button
+            onClick={() => {
+              setShowMenu(false);
+              handelLogout();
+            }}
+            className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition flex items-center gap-1 bg-red-100 rounded"
+          >
+            <AiOutlineLogout />Logout
+          </button>
+      </div>
+                
 }
 
               </div>

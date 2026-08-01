@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X, Send, Sparkles, FileText, Loader2 } from "lucide-react";
+import { X, Send, Sparkles, FileText, Loader2, Zap, Coins } from "lucide-react";
 import { useAiChat } from "./AiChatContext";
 import { useChatAi } from "@/hooks/Aihooks";
+import Authstore from "@/store/AuthStore";
+import { useRouter } from "next/navigation";
 
 type Message = {
   role: "user" | "assistant";
@@ -21,6 +23,9 @@ export default function AiChatDrawer() {
   const [sending, setSending] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const credits:any=Authstore(store=>store.credits);
+  const router = useRouter();
+  const outOfCredits = credits <= 0;
   const { mutateAsync: sendChat } = useChatAi();
 
   // Reset / restore the thread whenever the target note changes
@@ -38,8 +43,8 @@ export default function AiChatDrawer() {
   }, [messages, sending]);
 
   const handleSend = async () => {
-    const q = question.trim();
-    if (!q || sending) return;
+     const q = question.trim();
+  if (!q || sending || outOfCredits) return;
 
     setMessages((m) => [...m, { role: "user", text: q }]);
     setQuestion("");
@@ -104,13 +109,23 @@ export default function AiChatDrawer() {
               )}
             </div>
           </div>
-          <button
-            onClick={closeChat}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
-            aria-label="Close chat"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+    <span
+      className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+        outOfCredits ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"
+      }`}
+    >
+      <Coins size={12} />
+      {credits ?? 0}
+    </span>
+    <button
+      onClick={closeChat}
+      className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+      aria-label="Close chat"
+    >
+      <X size={18} />
+    </button>
+  </div>
         </div>
 
         {/* Messages */}
@@ -148,31 +163,55 @@ export default function AiChatDrawer() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-slate-100 p-4">
-          <div className="flex items-end gap-2 rounded-2xl border border-slate-200 focus-within:ring-2 focus-within:ring-blue-500 px-3 py-2">
-            <textarea
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              rows={1}
-              placeholder={target?.noteId ? "Ask about this note…" : "Ask anything…"}
-              className="flex-1 resize-none outline-none text-sm py-1 max-h-28"
-            />
-            <button
-              onClick={handleSend}
-              disabled={sending || !question.trim()}
-              className="shrink-0 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 p-2.5 text-white disabled:opacity-40 transition"
-              aria-label="Send"
-            >
-              <Send size={16} />
-            </button>
-          </div>
-        </div>
+        {/* Input / Paywall */}
+<div className="border-t border-slate-100 p-4">
+  {outOfCredits ? (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 text-center">
+      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+        <Zap size={18} />
+      </div>
+      <p className="mt-2.5 text-sm font-medium text-slate-800">
+        Sorry, your credits are over
+      </p>
+      <p className="mt-1 text-xs text-slate-500">
+        You're out of AI credits for now. Top up to keep chatting with your notes.
+      </p>
+      <button
+        onClick={() => {
+          closeChat();
+          router.push("/billing");
+        }}
+        className="mt-3 w-full rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition"
+      >
+        Get more credits
+      </button>
+    </div>
+  ) : (
+    <div className="flex items-end gap-2 rounded-2xl border border-slate-200 focus-within:ring-2 focus-within:ring-blue-500 px-3 py-2">
+      <textarea
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+          }
+        }}
+        rows={1}
+        placeholder={target?.noteId ? "Ask about this note…" : "Ask anything…"}
+        className="flex-1 resize-none outline-none text-sm py-1 max-h-28"
+      />
+      <button
+        onClick={handleSend}
+        disabled={sending || !question.trim()}
+        className="shrink-0 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 p-2.5 text-white disabled:opacity-40 transition"
+        aria-label="Send"
+      >
+        <Send size={16} />
+      </button>
+    </div>
+  )}
+</div>
       </div>
     </>
   );
