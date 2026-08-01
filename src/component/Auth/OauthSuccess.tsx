@@ -35,6 +35,7 @@ export default function OAuthSuccess() {
             email: email!,
             name: name!,
             role: role!,
+            credits: 0, 
         });
 
         router.replace("/");
