@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
   X,
-  BookOpen
+  BookOpen,
+  Coins
 } from "lucide-react";
 import Authstore from "@/store/AuthStore";
 import { ImProfile } from "react-icons/im";
@@ -53,11 +54,13 @@ export default function Navbar() {
   const {mutate}=useLogout()
  
   const token=Authstore(store=>store.accessToken);
+  const credits=Authstore(store=>store.credits)
   const name=Authstore(name=>name.name)
   
   const handelLogout=()=>{
      mutate(undefined)
   }
+  
   return (
     <header className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full px-5">
 
@@ -164,7 +167,23 @@ export default function Navbar() {
             {
               token ?
                (
-    <div className="relative" >
+    <div className="relative flex items-center gap-3" >
+      {token && (
+  <div
+    className="
+      flex items-center gap-1.5
+      rounded-full
+      bg-blue-50
+      border border-blue-100
+      px-3 py-1.5
+      text-sm font-medium text-blue-700
+    "
+    title="Remaining AI credits"
+  >
+    <Coins size={14} className="text-blue-500" />
+    <span>{credits ?? 0}</span>
+  </div>
+)}
       <div
         onClick={() => setShowMenu((prev) => !prev)}
         className="
@@ -186,21 +205,15 @@ export default function Navbar() {
       </div>
 
       {showMenu && (
-        <div
-          className="
-            absolute
-            right-0
-            mt-3
-            w-32
-            bg-white
-            rounded-xl
-            shadow-lg
-            border
-            border-slate-100
-            overflow-hidden
-            z-50
-          "
-        >
+        <div className="absolute right-0 top-12 mt-3 w-44 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-50">
+          {/* credits row inside dropdown too, mirrors it for mobile-width dropdown users */}
+          <div className="flex items-center justify-between px-4 py-2.5 text-sm text-slate-500 border-b border-slate-100">
+            <span>Credits</span>
+            <span className="flex items-center gap-1 font-semibold text-blue-600">
+              <Coins size={13} />
+              {credits ?? 0}
+            </span>
+          </div>
           <Link
             href="/profile"
             onClick={() => setShowMenu(false)}

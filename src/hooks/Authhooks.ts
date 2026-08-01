@@ -25,6 +25,7 @@ const useLogin = () => {
                 refersh_token: data.refreshToken,
                 name: data.user.name,
                 email: data.user.email,
+                credits: data.user.aiCredits,
                 role: decode?.resource_access?.['oauth2-client-credentials']?.roles,
             });
 

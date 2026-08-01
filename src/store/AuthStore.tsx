@@ -8,6 +8,7 @@ type StoreType = {
     // username:null | string,
     email: null | string,
     name: string | null,
+    credits:null | number,
     refreshToken: string | null,
     role: string | null,
     login: (logindata: LoginResponseData) => void,
@@ -20,6 +21,7 @@ const Authstore = create<StoreType>()(persist((set) => ({
     accessToken: null,
     email: null,
     refreshToken: null,
+    credits:null,
     name: null,
     role: null,
     login: (login) => {
@@ -29,6 +31,7 @@ const Authstore = create<StoreType>()(persist((set) => ({
             refreshToken: login.refersh_token,
             name: login.name,
             role: login.role,
+            credits:login.credits
         })
     },
     logout: (slient = false) => {

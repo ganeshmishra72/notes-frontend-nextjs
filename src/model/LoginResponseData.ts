@@ -4,4 +4,5 @@ export default interface LoginResponseData {
     name: string,
     refersh_token: string | null,
     role: string
+    credits: null | number,
 }

@@ -3,19 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Send, Sparkles, FileText, Loader2 } from "lucide-react";
 import { useAiChat } from "./AiChatContext";
+import { useChatAi } from "@/hooks/Aihooks";
 
 type Message = {
   role: "user" | "assistant";
   text: string;
 };
-
-// Matches your ChatResponse DTO: { answer, sessionId }
-type ChatApiResponse = {
-  answer: string;
-  sessionId: string;
-};
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 function sessionKey(noteId: string | undefined) {
   return `ai-chat-session:${noteId ?? "general"}`;
@@ -28,6 +21,7 @@ export default function AiChatDrawer() {
   const [sending, setSending] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { mutateAsync: sendChat } = useChatAi();
 
   // Reset / restore the thread whenever the target note changes
   useEffect(() => {
@@ -47,41 +41,21 @@ export default function AiChatDrawer() {
     const q = question.trim();
     if (!q || sending) return;
 
-    if (!target?.noteId) {
-      // No note in scope — nudge the user instead of silently failing the RAG call.
-      setMessages((m) => [
-        ...m,
-        { role: "user", text: q },
-        {
-          role: "assistant",
-          text: "Pick a note first — open any note's \"Ask AI\" button so I can search inside it. I can't answer without a document to ground my answer in.",
-        },
-      ]);
-      setQuestion("");
-      return;
-    }
-
     setMessages((m) => [...m, { role: "user", text: q }]);
     setQuestion("");
     setSending(true);
 
     try {
-      const res = await fetch(`${API_BASE}/api/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId,
-          noteId: target.noteId,
-          question: q,
-        }),
+      // noteId is undefined for a general chat — backend branches on this itself
+      // (skips retrieval, uses the relaxed system prompt) so we just pass it through.
+      const data = await sendChat({
+        sessionId,
+        noteId: target?.noteId,
+        question: q,
       });
 
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
-      const data: ChatApiResponse = await res.json();
-
       setSessionId(data.sessionId);
-      localStorage.setItem(sessionKey(target.noteId), data.sessionId);
+      localStorage.setItem(sessionKey(target?.noteId), data.sessionId);
       setMessages((m) => [...m, { role: "assistant", text: data.answer }]);
     } catch (err) {
       setMessages((m) => [
@@ -145,7 +119,7 @@ export default function AiChatDrawer() {
             <div className="text-center text-sm text-slate-400 mt-10">
               {target?.noteId
                 ? `Ask anything about "${target.noteTitle}" — summaries, explanations, MCQs.`
-                : "Open a note and hit \"Ask AI\" to start a grounded conversation about it."}
+                : "Ask a general question, or open a note and hit \"Ask AI\" for answers grounded in that document."}
             </div>
           )}
 
@@ -167,7 +141,7 @@ export default function AiChatDrawer() {
             <div className="flex justify-start">
               <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm bg-slate-100 px-4 py-2.5 text-sm text-slate-500">
                 <Loader2 size={14} className="animate-spin" />
-                Reading the note…
+                {target?.noteId ? "Reading the note…" : "Thinking…"}
               </div>
             </div>
           )}
@@ -186,7 +160,7 @@ export default function AiChatDrawer() {
                 }
               }}
               rows={1}
-              placeholder="Ask about this note…"
+              placeholder={target?.noteId ? "Ask about this note…" : "Ask anything…"}
               className="flex-1 resize-none outline-none text-sm py-1 max-h-28"
             />
             <button
